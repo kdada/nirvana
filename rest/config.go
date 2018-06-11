@@ -16,7 +16,45 @@ limitations under the License.
 
 package rest
 
+import (
+	"net/http"
+)
+
+// RequestExecutor implements a http client.
+type RequestExecutor interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 // Config is rest client config.
 type Config struct {
-	Endpoint string
+	// Scheme is http scheme. It can be "http" or "https".
+	Scheme string
+	// Host must be a host string, a host:port or a URL to a server.
+	Host string
+	// Executor is used to execute http requests.
+	// If it is empty, http.DefaultClient is used.
+	Executor RequestExecutor
+}
+
+// DeepCopy returns a new config copied from the current one.
+func (c *Config) DeepCopy() *Config {
+	cfg := *c
+	return &cfg
+}
+
+// Complete completes the config and returns an error if something is wrong.
+func (c *Config) Complete() error {
+	if c.Scheme == "" {
+		c.Scheme = "http"
+	}
+	if c.Scheme != "http" && c.Scheme != "https" {
+		return unrecognizedHTTPScheme.Error(c.Scheme)
+	}
+	if c.Host == "" {
+		return noHTTPHost.Error()
+	}
+	if c.Executor == nil {
+		c.Executor = &http.Client{}
+	}
+	return nil
 }
