@@ -159,7 +159,10 @@ func (c *Client) {{ .Name }}(ctx context.Context{{ range .Parameters }},{{ .Prop
     {{ end }}
 
 	{{ range .Results }}
+	{{- if ne .Creator "" }}
 	{{ .Destination }}({{ .ProposedName }}).
+    {{- end }}
+	{{ .Destination }}(&{{ .ProposedName }}).
     {{ end }}
 	Do(ctx)
 	return 

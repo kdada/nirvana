@@ -259,7 +259,7 @@ func (h *helper) Functions() []function {
 				Name:     h.namer.Name(def.Function),
 				Comments: h.namer.Comments(def.Function),
 			}
-			paramNames := h.namer.nameContainer()
+			sigNames := h.namer.nameContainer()
 
 			// If there is no specified consumer, defaults to application/json.
 			firstNonEmptyConsume := definition.MIMEJSON
@@ -278,7 +278,7 @@ func (h *helper) Functions() []function {
 				p := functionParameter{
 					Source:       string(param.Source),
 					Name:         param.Name,
-					ProposedName: paramNames.proposeName(param.Name, param.Type),
+					ProposedName: sigNames.proposeName(param.Name, param.Type),
 					Typ:          h.namer.Name(param.Type),
 				}
 				if param.Source == definition.Body {
@@ -308,7 +308,6 @@ func (h *helper) Functions() []function {
 				}
 				fn.Parameters = append(fn.Parameters, p)
 			}
-			resultNames := h.namer.nameContainer()
 			for _, result := range def.Results {
 				if result.Destination == definition.Error {
 					// Ignore errors
@@ -316,7 +315,7 @@ func (h *helper) Functions() []function {
 				}
 				r := functionResult{
 					Destination:  string(result.Destination),
-					ProposedName: resultNames.proposeName("", result.Type),
+					ProposedName: sigNames.proposeName("", result.Type),
 					Typ:          h.namer.Name(result.Type),
 				}
 				typ := h.definitions.Types[result.Type]
